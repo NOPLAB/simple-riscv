@@ -25,23 +25,24 @@ impl Display for DramError {
     }
 }
 
-pub const DRAM_SIZE: u32 = 0x3000;
+pub const DRAM_SIZE: u32 = 1024 * 1024 * 1; // 1MB
 
+#[derive(Debug, Clone)]
 pub struct Dram {
-    mem: [u8; DRAM_SIZE as usize],
+    dram: Vec<u8>,
 }
 
 impl Dram {
     pub fn new() -> Self {
         Self {
-            mem: [0; DRAM_SIZE as usize],
+            dram: vec![0; DRAM_SIZE as usize],
         }
     }
 
     pub fn load8(&mut self, start_address: u32, data: Vec<u8>) -> Result<(), ProcessorError> {
         if start_address + (data.len() as u32) < DRAM_SIZE as u32 {
             for (count, mem) in self
-                .mem
+                .dram
                 .iter_mut()
                 .skip(start_address as usize)
                 .take(data.len())
@@ -59,7 +60,7 @@ impl Dram {
         let mem_address = address; // None
 
         if mem_address < DRAM_SIZE as u32 {
-            Ok(self.mem[mem_address as usize])
+            Ok(self.dram[mem_address as usize])
         } else {
             Err(DramError::new(DramErrorType::AddressOutOfBounds))
         }
@@ -69,8 +70,8 @@ impl Dram {
         let mem_address = address << 1; // multi 2
 
         if mem_address < DRAM_SIZE as u32 {
-            Ok((self.mem[mem_address as usize] as u16) << 8
-                | (self.mem[mem_address as usize + 1] as u16))
+            Ok((self.dram[mem_address as usize] as u16) << 8
+                | (self.dram[mem_address as usize + 1] as u16))
         } else {
             Err(DramError::new(DramErrorType::AddressOutOfBounds))
         }
@@ -80,10 +81,10 @@ impl Dram {
         let mem_address = address << 2; // multi 4
 
         if mem_address < DRAM_SIZE as u32 {
-            Ok((self.mem[mem_address as usize] as u32) << 24
-                | (self.mem[mem_address as usize + 1] as u32) << 16
-                | (self.mem[mem_address as usize + 2] as u32) << 8
-                | (self.mem[mem_address as usize + 3] as u32))
+            Ok((self.dram[mem_address as usize] as u32) << 24
+                | (self.dram[mem_address as usize + 1] as u32) << 16
+                | (self.dram[mem_address as usize + 2] as u32) << 8
+                | (self.dram[mem_address as usize + 3] as u32))
         } else {
             Err(DramError::new(DramErrorType::AddressOutOfBounds))
         }
@@ -93,7 +94,7 @@ impl Dram {
         let mem_address = address; // None
 
         if mem_address < DRAM_SIZE as u32 {
-            self.mem[mem_address as usize] = value;
+            self.dram[mem_address as usize] = value;
             Ok(())
         } else {
             Err(DramError::new(DramErrorType::AddressOutOfBounds))
@@ -104,8 +105,8 @@ impl Dram {
         let mem_address = address << 1; // div 2
 
         if mem_address < DRAM_SIZE as u32 {
-            self.mem[mem_address as usize] = (value >> 8) as u8;
-            self.mem[mem_address as usize + 1] = value as u8;
+            self.dram[mem_address as usize] = (value >> 8) as u8;
+            self.dram[mem_address as usize + 1] = value as u8;
             Ok(())
         } else {
             Err(DramError::new(DramErrorType::AddressOutOfBounds))
@@ -116,10 +117,10 @@ impl Dram {
         let mem_address = address << 2; // div 4
 
         if mem_address < DRAM_SIZE as u32 {
-            self.mem[mem_address as usize] = (value >> 24) as u8;
-            self.mem[mem_address as usize + 1] = ((value | 0x00FF_0000) >> 16) as u8;
-            self.mem[mem_address as usize + 2] = ((value | 0x0000_FF00) >> 8) as u8;
-            self.mem[mem_address as usize + 3] = (value | 0x0000_00FF) as u8;
+            self.dram[mem_address as usize] = (value >> 24) as u8;
+            self.dram[mem_address as usize + 1] = ((value & 0x00FF_0000) >> 16) as u8;
+            self.dram[mem_address as usize + 2] = ((value & 0x0000_FF00) >> 8) as u8;
+            self.dram[mem_address as usize + 3] = value as u8;
 
             Ok(())
         } else {
@@ -132,7 +133,7 @@ impl Display for Dram {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut str = String::new();
         for i in 0..DRAM_SIZE {
-            str += &format!("{:0>2x} ", self.mem[i as usize]).to_string();
+            str += &format!("{:0>2x} ", self.dram[i as usize]).to_string();
             if i % 8 == 7 {
                 str += " ";
             }

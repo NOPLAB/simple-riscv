@@ -1,4 +1,11 @@
-use std::{fmt::Display, fs::File, io::Read, path::Path};
+use std::{
+    cell::{Cell, RefCell},
+    fmt::Display,
+    fs::File,
+    io::Read,
+    path::Path,
+    rc::Rc,
+};
 
 use crate::bus::Bus;
 
@@ -11,15 +18,18 @@ pub struct Processor {
     pub xregs: XRegisters,
     pub pc: u32,
 
-    pub bus: Bus,
+    pub fetch: Fetch,
+
+    pub bus: Rc<RefCell<Bus>>,
 }
 
 impl Processor {
     pub fn new() -> Self {
-        let mut bus = Bus::new();
+        let mut bus = Rc::new(RefCell::new(Bus::new()));
         Self {
             xregs: XRegisters::new(),
             pc: 0,
+            fetch: Fetch::new(Rc::clone(&(bus))),
             bus,
         }
     }
@@ -29,8 +39,10 @@ impl Processor {
         let mut data = Vec::new();
         file.read_to_end(&mut data).unwrap();
 
-        self.bus.dram.load8(0, data)?;
-        println!("{}", self.bus.dram);
+        Rc::clone(&(self.bus)).borrow_mut().dram.load8(0, data)?;
+        // println!("{}", Rc::clone(&(self.bus)).borrow_mut().dram);
+
+        self.fetch.fetch(0)?;
 
         Ok(())
     }

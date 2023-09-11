@@ -1,3 +1,5 @@
+use std::{cell::RefCell, rc::Rc};
+
 use crate::{
     bus::Bus,
     dram::{self, Dram},
@@ -5,17 +7,21 @@ use crate::{
 
 use super::ProcessorError;
 
-pub struct Fetch<'a> {
-    bus: &'a Bus,
+pub struct Fetch {
+    bus: Rc<RefCell<Bus>>,
 }
 
-impl<'a> Fetch<'a> {
-    pub fn new(bus: &'a Bus) -> Self {
+impl Fetch {
+    pub fn new(bus: Rc<RefCell<Bus>>) -> Self {
         Self { bus }
     }
 
     pub fn fetch(&mut self, address: u32) -> Result<u32, ProcessorError> {
-        println!("{}", self.bus.dram.read32(0)?);
-        todo!()
+        println!(
+            "0x{:x}",
+            Rc::clone(&(self.bus)).borrow_mut().dram.read32(address)?
+        );
+
+        Ok(0)
     }
 }
