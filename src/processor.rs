@@ -1,14 +1,27 @@
-use std::{fmt::Display, fs::File, io::Read, os::unix::net::UnixDatagram, path::Path};
+use std::{fmt::Display, fs::File, io::Read, path::Path};
 
 use crate::bus::Bus;
 
+use self::{fetch::Fetch, register::XRegisters};
+
+pub mod fetch;
+pub mod register;
+
 pub struct Processor {
+    pub xregs: XRegisters,
+    pub pc: u32,
+
     pub bus: Bus,
 }
 
 impl Processor {
     pub fn new() -> Self {
-        Self { bus: Bus::new() }
+        let mut bus = Bus::new();
+        Self {
+            xregs: XRegisters::new(),
+            pc: 0,
+            bus,
+        }
     }
 
     pub fn load(&mut self, path: &Path) -> Result<(), ProcessorError> {

@@ -19,25 +19,27 @@ impl ProcessorErrorTrait for DramError {}
 
 impl Display for DramError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Address is Out Of Range.")
+        match self.error_type {
+            DramErrorType::AddressOutOfBounds => write!(f, "Address is Out Of Range."),
+        }
     }
 }
 
-const MEMORY_SIZE: usize = 0x3000;
+pub const DRAM_SIZE: u32 = 0x3000;
 
 pub struct Dram {
-    mem: [u8; MEMORY_SIZE],
+    mem: [u8; DRAM_SIZE as usize],
 }
 
 impl Dram {
     pub fn new() -> Self {
         Self {
-            mem: [0; MEMORY_SIZE],
+            mem: [0; DRAM_SIZE as usize],
         }
     }
 
     pub fn load8(&mut self, start_address: u32, data: Vec<u8>) -> Result<(), ProcessorError> {
-        if start_address + (data.len() as u32) < MEMORY_SIZE as u32 {
+        if start_address + (data.len() as u32) < DRAM_SIZE as u32 {
             for (count, mem) in self
                 .mem
                 .iter_mut()
@@ -56,7 +58,7 @@ impl Dram {
     pub fn read8(&self, address: u32) -> Result<u8, ProcessorError> {
         let mem_address = address; // None
 
-        if mem_address < MEMORY_SIZE as u32 {
+        if mem_address < DRAM_SIZE as u32 {
             Ok(self.mem[mem_address as usize])
         } else {
             Err(DramError::new(DramErrorType::AddressOutOfBounds))
@@ -66,7 +68,7 @@ impl Dram {
     pub fn read16(&self, address: u32) -> Result<u16, ProcessorError> {
         let mem_address = address << 1; // multi 2
 
-        if mem_address < MEMORY_SIZE as u32 {
+        if mem_address < DRAM_SIZE as u32 {
             Ok((self.mem[mem_address as usize] as u16) << 8
                 | (self.mem[mem_address as usize + 1] as u16))
         } else {
@@ -77,7 +79,7 @@ impl Dram {
     pub fn read32(&self, address: u32) -> Result<u32, ProcessorError> {
         let mem_address = address << 2; // multi 4
 
-        if mem_address < MEMORY_SIZE as u32 {
+        if mem_address < DRAM_SIZE as u32 {
             Ok((self.mem[mem_address as usize] as u32) << 24
                 | (self.mem[mem_address as usize + 1] as u32) << 16
                 | (self.mem[mem_address as usize + 2] as u32) << 8
@@ -90,7 +92,7 @@ impl Dram {
     pub fn write8(&mut self, address: u32, value: u8) -> Result<(), ProcessorError> {
         let mem_address = address; // None
 
-        if mem_address < MEMORY_SIZE as u32 {
+        if mem_address < DRAM_SIZE as u32 {
             self.mem[mem_address as usize] = value;
             Ok(())
         } else {
@@ -101,7 +103,7 @@ impl Dram {
     pub fn write16(&mut self, address: u32, value: u16) -> Result<(), ProcessorError> {
         let mem_address = address << 1; // div 2
 
-        if mem_address < MEMORY_SIZE as u32 {
+        if mem_address < DRAM_SIZE as u32 {
             self.mem[mem_address as usize] = (value >> 8) as u8;
             self.mem[mem_address as usize + 1] = value as u8;
             Ok(())
@@ -113,7 +115,7 @@ impl Dram {
     pub fn write32(&mut self, address: u32, value: u32) -> Result<(), ProcessorError> {
         let mem_address = address << 2; // div 4
 
-        if mem_address < MEMORY_SIZE as u32 {
+        if mem_address < DRAM_SIZE as u32 {
             self.mem[mem_address as usize] = (value >> 24) as u8;
             self.mem[mem_address as usize + 1] = ((value | 0x00FF_0000) >> 16) as u8;
             self.mem[mem_address as usize + 2] = ((value | 0x0000_FF00) >> 8) as u8;
@@ -129,8 +131,8 @@ impl Dram {
 impl Display for Dram {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut str = String::new();
-        for i in 0..MEMORY_SIZE {
-            str += &format!("{:0>2x} ", self.mem[i]).to_string();
+        for i in 0..DRAM_SIZE {
+            str += &format!("{:0>2x} ", self.mem[i as usize]).to_string();
             if i % 8 == 7 {
                 str += " ";
             }
