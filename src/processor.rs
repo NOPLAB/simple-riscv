@@ -11,6 +11,7 @@ use crate::bus::Bus;
 
 use self::{fetch::Fetch, register::XRegisters};
 
+pub mod decode;
 pub mod fetch;
 pub mod register;
 
@@ -25,7 +26,7 @@ pub struct Processor {
 
 impl Processor {
     pub fn new() -> Self {
-        let mut bus = Rc::new(RefCell::new(Bus::new()));
+        let bus = Rc::new(RefCell::new(Bus::new()));
         Self {
             xregs: XRegisters::new(),
             pc: 0,
@@ -43,6 +44,13 @@ impl Processor {
         // println!("{}", Rc::clone(&(self.bus)).borrow_mut().dram);
 
         self.fetch.fetch(0)?;
+
+        Ok(())
+    }
+
+    // todo
+    pub fn increment(&mut self) -> Result<(), ProcessorError> {
+        self.fetch.fetch(self.pc);
 
         Ok(())
     }

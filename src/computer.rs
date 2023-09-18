@@ -1,9 +1,6 @@
-use std::{fs::File, io::Read, path::Path};
+use std::path::Path;
 
-use crate::{
-    bus::Bus,
-    processor::{Processor, ProcessorError},
-};
+use crate::processor::{Processor, ProcessorError};
 
 pub struct Computer {
     processor: Processor,
@@ -19,7 +16,12 @@ impl Computer {
     pub fn run(&mut self, path: &Path) -> Result<(), ProcessorError> {
         println!("RUN - {}", path.to_str().unwrap());
 
+        self.processor = Processor::new();
         self.processor.load(path)?;
+
+        loop {
+            self.processor.increment()?;
+        }
 
         Ok(())
     }

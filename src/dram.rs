@@ -10,7 +10,7 @@ pub struct DramError {
 }
 
 impl DramError {
-    fn new(error_type: DramErrorType) -> Box<Self> {
+    pub fn new(error_type: DramErrorType) -> Box<Self> {
         Box::new(DramError { error_type })
     }
 }
