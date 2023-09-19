@@ -43,13 +43,15 @@ impl Processor {
         file.read_to_end(&mut data).unwrap();
 
         self.bus.dram.load8(0, data)?;
-        // println!("{}", Rc::clone(&(self.bus)).borrow_mut().dram);
+        // println!("{}", self.bus.dram);
 
         Ok(())
     }
 
     // todo
     pub fn increment(&mut self) -> Result<(), ProcessorError> {
+        println!("pc: 0x{:0>8x}", self.pc);
+
         println!("Xregisters: {}", self.xregs);
         let inst = self.fetch.fetch(self.pc, &self.bus)?;
         let decode_res = self.decode.decode(inst, &self.xregs)?;

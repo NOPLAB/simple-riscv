@@ -41,13 +41,13 @@ impl Writeback {
         xregs: &mut XRegisters,
         bus: &mut Bus,
     ) -> Result<(), ProcessorError> {
-        let wb_data = bus.dram.read32(execute.alu_out)?;
+        let rd_data = bus.dram.read32(execute.alu_out)?;
 
-        println!("Writeback: wb_data 0x{:0>8x}({})", wb_data, wb_data);
+        println!("Writeback: rd(wb_data) 0x{:0>8x}({})", rd_data, rd_data);
 
         match decode.opcode {
-            Opcode::LW => xregs.write(decode.wb_addr, wb_data),
-            Opcode::SW => todo!(),
+            Opcode::LW => xregs.write(decode.rd, rd_data),
+            Opcode::SW => bus.dram.write32(execute.alu_out, decode.rs2_data)?,
         }
         Ok(())
     }

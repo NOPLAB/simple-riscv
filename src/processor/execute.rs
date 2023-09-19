@@ -45,7 +45,7 @@ impl Execute {
     ) -> Result<ExecuteResult, ProcessorError> {
         let alu_out: u32 = match decode.opcode {
             Opcode::LW => (decode.rs1_data as i32 + decode.imm_i_sext) as u32,
-            _ => todo!(),
+            Opcode::SW => (decode.rs1_data as i32 + decode.imm_s_sext) as u32,
         };
         println!("Execute: alu_out: {}", alu_out);
         Ok(ExecuteResult { alu_out })
