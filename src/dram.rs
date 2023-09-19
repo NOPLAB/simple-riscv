@@ -70,8 +70,8 @@ impl Dram {
         let mem_address = address << 1; // multi 2
 
         if mem_address < DRAM_SIZE as u32 {
-            Ok((self.dram[mem_address as usize] as u16) << 8
-                | (self.dram[mem_address as usize + 1] as u16))
+            Ok((self.dram[mem_address as usize + 1] as u16) << 8
+                | (self.dram[mem_address as usize] as u16))
         } else {
             Err(DramError::new(DramErrorType::AddressOutOfBounds))
         }
@@ -81,10 +81,10 @@ impl Dram {
         let mem_address = address << 2; // multi 4
 
         if mem_address < DRAM_SIZE as u32 {
-            Ok((self.dram[mem_address as usize] as u32) << 24
-                | (self.dram[mem_address as usize + 1] as u32) << 16
-                | (self.dram[mem_address as usize + 2] as u32) << 8
-                | (self.dram[mem_address as usize + 3] as u32))
+            Ok((self.dram[mem_address as usize + 3] as u32) << 24
+                | (self.dram[mem_address as usize + 2] as u32) << 16
+                | (self.dram[mem_address as usize + 1] as u32) << 8
+                | (self.dram[mem_address as usize] as u32))
         } else {
             Err(DramError::new(DramErrorType::AddressOutOfBounds))
         }
@@ -105,8 +105,8 @@ impl Dram {
         let mem_address = address << 1; // div 2
 
         if mem_address < DRAM_SIZE as u32 {
-            self.dram[mem_address as usize] = (value >> 8) as u8;
-            self.dram[mem_address as usize + 1] = value as u8;
+            self.dram[mem_address as usize + 1] = (value >> 8) as u8;
+            self.dram[mem_address as usize] = value as u8;
             Ok(())
         } else {
             Err(DramError::new(DramErrorType::AddressOutOfBounds))
@@ -117,10 +117,10 @@ impl Dram {
         let mem_address = address << 2; // div 4
 
         if mem_address < DRAM_SIZE as u32 {
-            self.dram[mem_address as usize] = (value >> 24) as u8;
-            self.dram[mem_address as usize + 1] = ((value & 0x00FF_0000) >> 16) as u8;
-            self.dram[mem_address as usize + 2] = ((value & 0x0000_FF00) >> 8) as u8;
-            self.dram[mem_address as usize + 3] = value as u8;
+            self.dram[mem_address as usize + 3] = (value >> 24) as u8;
+            self.dram[mem_address as usize + 2] = ((value & 0x00FF_0000) >> 16) as u8;
+            self.dram[mem_address as usize + 1] = ((value & 0x0000_FF00) >> 8) as u8;
+            self.dram[mem_address as usize] = value as u8;
 
             Ok(())
         } else {
