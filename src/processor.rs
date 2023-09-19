@@ -2,12 +2,15 @@ use std::{fmt::Display, fs::File, io::Read, path::Path};
 
 use crate::bus::Bus;
 
-use self::{decode::Decode, execute::Execute, fetch::Fetch, register::XRegisters};
+use self::{
+    decode::Decode, execute::Execute, fetch::Fetch, register::XRegisters, writeback::Writeback,
+};
 
 pub mod decode;
 pub mod execute;
 pub mod fetch;
 pub mod register;
+pub mod writeback;
 
 pub struct Processor {
     pub xregs: XRegisters,
@@ -16,6 +19,7 @@ pub struct Processor {
     pub fetch: Fetch,
     pub decode: Decode,
     pub execute: Execute,
+    pub writeback: Writeback,
 
     pub bus: Bus,
 }
@@ -28,6 +32,7 @@ impl Processor {
             fetch: Fetch(),
             decode: Decode(),
             execute: Execute(),
+            writeback: Writeback(),
             bus: Bus::new(),
         }
     }
@@ -45,15 +50,26 @@ impl Processor {
 
     // todo
     pub fn increment(&mut self) -> Result<(), ProcessorError> {
-        let inst = self.fetch.fetch(self.pc / 4, &self.bus)?;
+        println!("Xregisters: {}", self.xregs);
+        let inst = self.fetch.fetch(self.pc, &self.bus)?;
         let decode_res = self.decode.decode(inst, &self.xregs)?;
-        let alu_out = self
+        let execute_res = self
             .execute
-            .execute(decode_res, &mut self.bus, &mut self.xregs);
+            .execute(decode_res, &mut self.bus, &mut self.xregs)?;
+        self.writeback
+            .writeback(decode_res, execute_res, &mut self.xregs, &mut self.bus)?;
 
         self.pc += 4;
 
+        println!("");
+
         Ok(())
+    }
+}
+
+impl Default for Processor {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

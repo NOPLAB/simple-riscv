@@ -32,6 +32,10 @@ impl Display for ExecuteError {
     }
 }
 
+pub struct ExecuteResult {
+    pub alu_out: u32,
+}
+
 pub struct Execute();
 
 impl Execute {
@@ -40,11 +44,20 @@ impl Execute {
         decode: DecodeResult,
         bus: &mut Bus,
         xregs: &mut XRegisters,
-    ) -> Result<u32, ProcessorError> {
-        match decode.opcode {
-            Opcode::LW => Ok(decode.rs1 + decode.imm_i_sext),
-            Opcode::None => Err(ExecuteError::new(ExecuteErrorType::NotMatchOpcode)),
+    ) -> Result<ExecuteResult, ProcessorError> {
+        let alu_out: Option<u32> = match decode.opcode {
+            Opcode::LW => Some((decode.rs1_data as i32 + decode.imm_i_sext) as u32),
+            Opcode::None => None,
             _ => todo!(),
+        };
+
+        match alu_out {
+            Some(alu_out) => {
+                println!("Execute: alu_out: {}", alu_out);
+                Ok(ExecuteResult { alu_out })
+            }
+            // None => Err(ExecuteError::new(ExecuteErrorType::NotMatchOpcode)),
+            None => Ok(ExecuteResult { alu_out: 0 }),
         }
     }
 }

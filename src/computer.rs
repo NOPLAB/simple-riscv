@@ -19,7 +19,7 @@ impl Computer {
         self.processor = Processor::new();
         self.processor.load(path)?;
 
-        for i in 0..10 {
+        for _ in 0..10 {
             self.processor.increment()?;
         }
 

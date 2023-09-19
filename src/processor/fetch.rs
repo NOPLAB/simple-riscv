@@ -4,9 +4,7 @@ use crate::bus::Bus;
 
 use super::{ProcessorError, ProcessorErrorTrait};
 
-pub enum FetchErrorType {
-    DramError(Box<dyn ProcessorErrorTrait>),
-}
+pub enum FetchErrorType {}
 
 pub struct FetchError {
     error_type: FetchErrorType,
@@ -23,7 +21,7 @@ impl ProcessorErrorTrait for FetchError {}
 impl Display for FetchError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.error_type {
-            FetchErrorType::DramError(err) => write!(f, "Dram Error: {}", err),
+            _ => todo!(),
         }
     }
 }
@@ -36,9 +34,6 @@ impl Fetch {
 
         let physical_pc = pc;
 
-        match bus.dram.read32(physical_pc) {
-            Ok(value) => Ok(value),
-            Err(err) => Err(FetchError::new(FetchErrorType::DramError(err))),
-        }
+        bus.dram.read32(physical_pc)
     }
 }

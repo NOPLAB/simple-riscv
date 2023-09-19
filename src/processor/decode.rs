@@ -29,22 +29,23 @@ impl Display for DecodeError {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Opcode {
     LW,
     SW,
     None,
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct DecodeResult {
     pub opcode: Opcode,
 
-    pub rs1: u32,
-    pub rs2: u32,
+    pub rs1_data: u32,
+    pub rs2_data: u32,
     pub wb_addr: u32,
 
     pub imm_i: u32,
-    pub imm_i_sext: u32,
+    pub imm_i_sext: i32,
 }
 
 pub struct Decode();
@@ -60,19 +61,27 @@ impl Decode {
         let rs2_data = xregs.read(rs2_addr);
 
         let imm_i = inst_slice[20..=31].load::<u32>();
-        let imm_i_sext = sign_extension(imm_i, 11);
+        let imm_i_sext = inst_slice[20..=31].load::<i32>();
+
+        println!("{}", imm_i_sext);
 
         let opcode = self.match_opcode(inst);
 
+        println!("Decode: opcode \x1b[38;5;2m{:?}\x1b[m", opcode);
         println!(
-            "Decode: opcode {:?}, rs2_addr 0b{:0>5b}, rs1_addr 0b{:0>5b}, wb_addr 0b{:0>5b}",
-            opcode, rs2_addr, rs1_addr, wb_addr
+            "        rs1_addr 0b{:0>5b}({}), rs2_addr 0b{:0>5b}({}), wb_addr 0b{:0>5b}({})",
+            rs1_addr, rs1_addr, rs2_addr, rs2_addr, wb_addr, wb_addr
+        );
+
+        println!(
+            "        rs1_data 0b{:0>5b}({}), rs2_data 0b{:0>5b}({})",
+            rs1_data, rs1_data, rs2_data, rs2_data
         );
 
         Ok(DecodeResult {
             opcode,
-            rs1: rs1_data,
-            rs2: rs2_data,
+            rs1_data,
+            rs2_data,
             wb_addr,
             imm_i,
             imm_i_sext,
