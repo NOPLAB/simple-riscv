@@ -9,7 +9,7 @@ use std::path::Path;
 fn main() {
     println!("Hello, world!");
 
-    let path = Path::new("./test/rv32ui-p-add");
+    let path = Path::new("./test/sample02");
 
     let mut emulator = Computer::new();
 

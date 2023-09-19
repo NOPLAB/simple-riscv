@@ -4,6 +4,7 @@ use crate::{bus::DRAM_BASE, dram::DRAM_SIZE};
 
 const REGISTERS_COUNT: usize = 32;
 
+#[derive(Debug, Clone, Copy)]
 pub struct XRegisters {
     xregs: [u32; REGISTERS_COUNT],
 }

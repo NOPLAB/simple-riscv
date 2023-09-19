@@ -1,6 +1,6 @@
-use std::{cell::RefCell, fmt::Display, rc::Rc};
+use std::fmt::Display;
 
-use crate::{bus::Bus, dram::DramError};
+use crate::bus::Bus;
 
 use super::{ProcessorError, ProcessorErrorTrait};
 
@@ -28,25 +28,15 @@ impl Display for FetchError {
     }
 }
 
-pub struct Fetch {
-    bus: Rc<RefCell<Bus>>,
-}
+pub struct Fetch();
 
 impl Fetch {
-    pub fn new(bus: Rc<RefCell<Bus>>) -> Self {
-        Self { bus }
-    }
-
-    // todo
-    pub fn fetch(&mut self, pc: u32) -> Result<u32, ProcessorError> {
-        println!(
-            "Fetch: 0x{:x}",
-            Rc::clone(&(self.bus)).borrow_mut().dram.read32(pc)?
-        );
+    pub fn fetch(&mut self, pc: u32, bus: &Bus) -> Result<u32, ProcessorError> {
+        println!("Fetch: 0x{:0>8x}", bus.dram.read32(pc)?);
 
         let physical_pc = pc;
 
-        match self.bus.borrow().dram.read32(physical_pc) {
+        match bus.dram.read32(physical_pc) {
             Ok(value) => Ok(value),
             Err(err) => Err(FetchError::new(FetchErrorType::DramError(err))),
         }
