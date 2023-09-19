@@ -33,7 +33,6 @@ impl Display for DecodeError {
 pub enum Opcode {
     LW,
     SW,
-    None,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -65,40 +64,44 @@ impl Decode {
 
         println!("{}", imm_i_sext);
 
-        let opcode = self.match_opcode(inst);
+        if let Some(opcode) = self.match_opcode(inst) {
+            println!("Decode: opcode \x1b[38;5;2m{:?}\x1b[m", opcode);
+            println!(
+                "        rs1_addr 0b{:0>5b}({}), rs2_addr 0b{:0>5b}({}), wb_addr 0b{:0>5b}({})",
+                rs1_addr, rs1_addr, rs2_addr, rs2_addr, wb_addr, wb_addr
+            );
 
-        println!("Decode: opcode \x1b[38;5;2m{:?}\x1b[m", opcode);
-        println!(
-            "        rs1_addr 0b{:0>5b}({}), rs2_addr 0b{:0>5b}({}), wb_addr 0b{:0>5b}({})",
-            rs1_addr, rs1_addr, rs2_addr, rs2_addr, wb_addr, wb_addr
-        );
+            println!(
+                "        rs1_data 0b{:0>5b}({}), rs2_data 0b{:0>5b}({})",
+                rs1_data, rs1_data, rs2_data, rs2_data
+            );
 
-        println!(
-            "        rs1_data 0b{:0>5b}({}), rs2_data 0b{:0>5b}({})",
-            rs1_data, rs1_data, rs2_data, rs2_data
-        );
-
-        Ok(DecodeResult {
-            opcode,
-            rs1_data,
-            rs2_data,
-            wb_addr,
-            imm_i,
-            imm_i_sext,
-        })
+            Ok(DecodeResult {
+                opcode,
+                rs1_data,
+                rs2_data,
+                wb_addr,
+                imm_i,
+                imm_i_sext,
+            })
+        } else {
+            Err(DecodeError::new(DecodeErrorType::NotMatchOpcode))
+        }
     }
 
     #[bitmatch]
-    fn match_opcode(&self, inst: u32) -> Opcode {
+    fn match_opcode(&self, inst: u32) -> Option<Opcode> {
         #[bitmatch]
         match inst {
-            "?????????????????010?????0000011" => Opcode::LW,
-            "?????????????????010?????0100011" => Opcode::SW,
-            _ => Opcode::None,
+            "?????????????????010?????0000011" => Some(Opcode::LW),
+            "?????????????????010?????0100011" => Some(Opcode::SW),
+            _ => None,
+            // None => Err(DecodeError::new(DecodeErrorType::NotMatchOpcode)),
         }
     }
 }
 
+/*
 pub fn sign_extension(value: u32, n_top: u32) -> u32 {
     // 符号を取得
     let sign = (value >> n_top) % 2;
@@ -114,3 +117,4 @@ pub fn sign_extension(value: u32, n_top: u32) -> u32 {
 
     value
 }
+*/

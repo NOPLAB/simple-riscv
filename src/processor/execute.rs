@@ -8,9 +8,7 @@ use super::{
     ProcessorError, ProcessorErrorTrait,
 };
 
-pub enum ExecuteErrorType {
-    NotMatchOpcode,
-}
+pub enum ExecuteErrorType {}
 
 pub struct ExecuteError {
     error_type: ExecuteErrorType,
@@ -27,7 +25,7 @@ impl ProcessorErrorTrait for ExecuteError {}
 impl Display for ExecuteError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.error_type {
-            ExecuteErrorType::NotMatchOpcode => write!(f, "Not match opcode."),
+            _ => todo!(),
         }
     }
 }
@@ -45,19 +43,11 @@ impl Execute {
         bus: &mut Bus,
         xregs: &mut XRegisters,
     ) -> Result<ExecuteResult, ProcessorError> {
-        let alu_out: Option<u32> = match decode.opcode {
-            Opcode::LW => Some((decode.rs1_data as i32 + decode.imm_i_sext) as u32),
-            Opcode::None => None,
+        let alu_out: u32 = match decode.opcode {
+            Opcode::LW => (decode.rs1_data as i32 + decode.imm_i_sext) as u32,
             _ => todo!(),
         };
-
-        match alu_out {
-            Some(alu_out) => {
-                println!("Execute: alu_out: {}", alu_out);
-                Ok(ExecuteResult { alu_out })
-            }
-            // None => Err(ExecuteError::new(ExecuteErrorType::NotMatchOpcode)),
-            None => Ok(ExecuteResult { alu_out: 0 }),
-        }
+        println!("Execute: alu_out: {}", alu_out);
+        Ok(ExecuteResult { alu_out })
     }
 }

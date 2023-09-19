@@ -48,7 +48,6 @@ impl Writeback {
         match decode.opcode {
             Opcode::LW => xregs.write(decode.wb_addr, wb_data),
             Opcode::SW => todo!(),
-            Opcode::None => todo!(),
         }
         Ok(())
     }
