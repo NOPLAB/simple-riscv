@@ -2,9 +2,10 @@ use std::{fmt::Display, fs::File, io::Read, path::Path};
 
 use crate::bus::Bus;
 
-use self::{decode::Decode, fetch::Fetch, register::XRegisters};
+use self::{decode::Decode, execute::Execute, fetch::Fetch, register::XRegisters};
 
 pub mod decode;
+pub mod execute;
 pub mod fetch;
 pub mod register;
 
@@ -14,6 +15,7 @@ pub struct Processor {
 
     pub fetch: Fetch,
     pub decode: Decode,
+    pub execute: Execute,
 
     pub bus: Bus,
 }
@@ -25,6 +27,7 @@ impl Processor {
             pc: 0,
             fetch: Fetch(),
             decode: Decode(),
+            execute: Execute(),
             bus: Bus::new(),
         }
     }
@@ -44,6 +47,9 @@ impl Processor {
     pub fn increment(&mut self) -> Result<(), ProcessorError> {
         let inst = self.fetch.fetch(self.pc / 4, &self.bus)?;
         let decode_res = self.decode.decode(inst, &self.xregs)?;
+        let alu_out = self
+            .execute
+            .execute(decode_res, &mut self.bus, &mut self.xregs);
 
         self.pc += 4;
 

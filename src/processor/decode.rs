@@ -1,12 +1,10 @@
-use std::{cell::RefCell, fmt::Display, rc::Rc};
+use std::fmt::Display;
 
 use bitvec::field::BitField;
 use bitvec::prelude::Lsb0;
 use bitvec::view::BitView;
 
 use bitpattern::bitpattern;
-
-use crate::bus::Bus;
 
 use super::register::XRegisters;
 use super::{ProcessorError, ProcessorErrorTrait};
@@ -43,14 +41,14 @@ pub enum Opcode {
 }
 
 pub struct DecodeResult {
-    opcode: Opcode,
+    pub opcode: Opcode,
 
-    rs1: u32,
-    rs2: u32,
-    wb_addr: u32,
+    pub rs1: u32,
+    pub rs2: u32,
+    pub wb_addr: u32,
 
-    imm_i: u32,
-    imm_i_sext: u32,
+    pub imm_i: u32,
+    pub imm_i_sext: u32,
 }
 
 pub struct Decode();
