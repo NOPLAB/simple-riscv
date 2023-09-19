@@ -1,13 +1,9 @@
 use std::fmt::Display;
 
-use bitvec::field::BitField;
-use bitvec::prelude::Lsb0;
-use bitvec::view::BitView;
+use bitmatch::bitmatch;
+use bitvec::{field::BitField, prelude::Lsb0, view::BitView};
 
-use bitpattern::bitpattern;
-
-use super::register::XRegisters;
-use super::{ProcessorError, ProcessorErrorTrait};
+use super::{register::XRegisters, ProcessorError, ProcessorErrorTrait};
 
 pub enum DecodeErrorType {
     NotMatchOpcode,
@@ -66,13 +62,7 @@ impl Decode {
         let imm_i = inst_slice[20..=31].load::<u32>();
         let imm_i_sext = sign_extension(imm_i, 11);
 
-        let opcode = if bitpattern!("?????????????????010?????0000011", inst) == Some(()) {
-            Opcode::LW
-        } else if bitpattern!("?????????????????010?????0100011", inst) == Some(()) {
-            Opcode::SW
-        } else {
-            Opcode::None
-        };
+        let opcode = self.match_opcode(inst);
 
         println!(
             "Decode: opcode {:?}, rs2_addr 0b{:0>5b}, rs1_addr 0b{:0>5b}, wb_addr 0b{:0>5b}",
@@ -87,6 +77,16 @@ impl Decode {
             imm_i,
             imm_i_sext,
         })
+    }
+
+    #[bitmatch]
+    fn match_opcode(&self, inst: u32) -> Opcode {
+        #[bitmatch]
+        match inst {
+            "?????????????????010?????0000011" => Opcode::LW,
+            "?????????????????010?????0100011" => Opcode::SW,
+            _ => Opcode::None,
+        }
     }
 }
 

@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 bitvec = "1.0.1"
 bitpattern = "0.1.0"
+bitmatch = "0.1.1"
