@@ -24,12 +24,12 @@ impl ProcessorErrorTrait for BusError {}
 impl Display for BusError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.error_type {
-            BusErrorType::AddressOutOfBounds => write!(f, "AddressOutOfBounds"),
+            BusErrorType::AddressOutOfBounds => write!(f, "BusAddressOutOfBounds"),
         }
     }
 }
 
-pub const DRAM_BASE: u32 = 0x800_0000;
+pub const DRAM_BASE: u32 = 0x80000000;
 
 #[derive(Debug, Clone)]
 pub struct Bus {

@@ -32,7 +32,7 @@ impl Processor {
         Self {
             xregs: XRegisters::new(),
             csr: ControlAndStatusRegister::new(),
-            pc: 0x800_0000 + 0x1000,
+            pc: 0x80000000 + 0x1000,
             fetch: Fetch(),
             decode: Decode(),
             execute: Execute(),
@@ -54,7 +54,7 @@ impl Processor {
 
     // todo
     pub fn increment(&mut self) -> Result<(), ProcessorError> {
-        println!("pc: 0x{:0>8x}", self.pc);
+        println!("pc: 0x{:0>8x}", self.pc - 0x1000); // !DO
 
         println!("Xregisters: {}", self.xregs);
         let inst = self.fetch.fetch(self.pc, &self.bus)?;
@@ -70,11 +70,16 @@ impl Processor {
 
         // この処理はFetchでやるべき
         if let Some(br_target) = execute_res.br_target {
-            self.pc = br_target
+            self.pc = br_target;
+            println!("Processor: BR TARGET: {:x}", br_target);
         } else if let Some(jmp_target) = execute_res.jmp_target {
-            self.pc = jmp_target
+            self.pc = jmp_target;
+            println!("Processor: JMP TARGET: {:x}", jmp_target);
         } else if decode_res.opcode == Opcode::ECALL {
-            self.pc += self.csr.read(0x305)
+            self.pc += self.csr.read(0x305);
+            println!("Processor: ECALL!!!!");
+        } else {
+            self.pc += 4;
         }
 
         println!("");

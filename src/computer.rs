@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{path::Path, thread, time::Duration};
 
 use crate::processor::{Processor, ProcessorError};
 
@@ -21,6 +21,7 @@ impl Computer {
 
         loop {
             self.processor.increment()?;
+            // thread::sleep(Duration::from_millis(100));
         }
 
         Ok(())

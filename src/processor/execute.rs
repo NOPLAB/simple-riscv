@@ -43,8 +43,8 @@ impl Execute {
             Opcode::LW => (decode.rs1_data as i32 + decode.imm_i_sext) as u32,
             Opcode::SW => (decode.rs1_data as i32 + decode.imm_s_sext) as u32,
 
-            Opcode::ADD => decode.rs1_data + decode.rs2_data,
-            Opcode::ADDI => (decode.rs1_data as i32 + decode.imm_i_sext) as u32,
+            Opcode::ADD => decode.rs1_data.wrapping_add(decode.rs2_data),
+            Opcode::ADDI => (decode.rs1_data as i32).wrapping_add(decode.imm_i_sext) as u32,
 
             Opcode::SUB => decode.rs1_data - decode.rs2_data,
 
@@ -109,10 +109,15 @@ impl Execute {
             _ => None,
         };
 
-        println!(
-            "Execute: alu_out: {}, br: {:?}, jmp_target: {:?}",
-            alu_out, br_flg, jmp_target
-        );
+        print!("Execute: alu_out: {}", alu_out);
+        if let Some(br) = br_target {
+            print!(", br_target: 0x{:x}", br)
+        }
+        if let Some(jmp) = jmp_target {
+            print!(", jmp_target: 0x{:x}", jmp)
+        }
+        println!();
+
         Ok(ExecuteResult {
             alu_out,
             br_target,

@@ -43,7 +43,9 @@ impl Writeback {
         csr: &mut ControlAndStatusRegister,
         bus: &mut Bus,
     ) -> Result<(), ProcessorError> {
-        let rd_data = bus.read32(execute.alu_out)?;
+        if let Ok(rd_data) = bus.read32(execute.alu_out) {
+            println!("Writeback: rd(wb_data) 0x{:0>8x}({})", rd_data, rd_data);
+        };
         let crs_data = csr.read(decode.csr);
 
         match decode.opcode {
@@ -56,10 +58,8 @@ impl Writeback {
             _ => (),
         }
 
-        println!("Writeback: rd(wb_data) 0x{:0>8x}({})", rd_data, rd_data);
-
         match decode.opcode {
-            Opcode::LW => xregs.write(decode.rd, rd_data),
+            Opcode::LW => xregs.write(decode.rd, bus.read32(execute.alu_out)?),
             Opcode::SW => bus.write32(execute.alu_out, decode.rs2_data)?,
 
             Opcode::BEQ => (),
@@ -77,6 +77,10 @@ impl Writeback {
             Opcode::CSRRCI => xregs.write(decode.rd, crs_data),
 
             Opcode::ECALL => csr.write(0x342, 11),
+
+            Opcode::MRET => (), // todo
+
+            Opcode::FENCE => (), // todo
 
             _ => xregs.write(decode.rd, execute.alu_out),
         }

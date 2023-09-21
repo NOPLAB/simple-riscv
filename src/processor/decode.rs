@@ -79,6 +79,9 @@ pub enum Opcode {
     CSRRCI,
 
     ECALL,
+
+    MRET,  // todo
+    FENCE, // todo
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -125,27 +128,34 @@ impl Decode {
         let imm_i = inst_slice[20..=31].load::<u32>();
         let imm_i_sext = inst_slice[20..=31].load::<i32>();
 
-        let mut imm_s_vec = inst_slice[7..=11].to_bitvec();
+        let mut imm_s_vec = bitvec![u32, Lsb0;];
         imm_s_vec.append(&mut inst_slice[25..=31].to_bitvec());
+        imm_s_vec.append(&mut inst_slice[7..=11].to_bitvec());
         let imm_s = imm_s_vec.load::<u32>();
         let imm_s_sext = imm_s_vec.load::<i32>();
 
         let mut imm_b_vec = bitvec![u32, Lsb0;];
-        imm_b_vec.push(inst_slice[31]);
-        imm_b_vec.push(inst_slice[7]);
-        imm_b_vec.append(&mut inst_slice[25..=30].to_bitvec());
-        imm_b_vec.append(&mut inst_slice[8..=11].to_bitvec());
-        let imm_b = imm_b_vec.load::<u32>();
+        // imm_b_vec.push(inst_slice[31]);
+        // imm_b_vec.push(inst_slice[7]);
+        // imm_b_vec.append(&mut inst_slice[25..=30].to_bitvec());
+        // imm_b_vec.append(&mut inst_slice[8..=11].to_bitvec());
+        // imm_b_vec.push(false);
         imm_b_vec.push(false);
+        imm_b_vec.append(&mut inst_slice[8..=11].to_bitvec());
+        imm_b_vec.append(&mut inst_slice[25..=30].to_bitvec());
+        imm_b_vec.push(inst_slice[7]);
+        imm_b_vec.push(inst_slice[31]);
+        let imm_b = imm_b_vec.load::<u32>();
         let imm_b_sext = imm_b_vec.load::<i32>();
 
         let mut imm_j_vec = bitvec![u32, Lsb0;];
-        imm_j_vec.push(inst_slice[31]);
-        imm_j_vec.append(&mut inst_slice[12..=19].to_bitvec());
-        imm_j_vec.push(inst_slice[20]);
+        imm_j_vec.push(false);
         imm_j_vec.append(&mut inst_slice[21..=30].to_bitvec());
+        imm_j_vec.push(inst_slice[20]);
+        imm_j_vec.append(&mut inst_slice[12..=19].to_bitvec());
+        imm_j_vec.push(inst_slice[31]);
         let imm_j = imm_j_vec.load::<u32>();
-        imm_b_vec.push(false);
+
         let imm_j_sext = imm_j_vec.load::<i32>();
 
         let imm_u = inst_slice[12..=31].load::<u32>();
@@ -158,13 +168,18 @@ impl Decode {
         if let Some(opcode) = self.match_opcode(inst) {
             println!("Decode: opcode \x1b[38;5;2m{:?}\x1b[m", opcode);
             println!(
-                "        rs1_addr 0b{:0>5b}({}),    rs2_addr 0b{:0>5b}({}), rd(wb_addr) 0b{:0>5b}({})",
+                "        rs1_addr: 0b{:0>5b}({}),    rs2_addr: 0b{:0>5b}({}), rd(wb_addr): 0b{:0>5b}({})",
                 rs1_addr, rs1_addr, rs2_addr, rs2_addr, rd, rd
             );
 
             println!(
-                "        rs1_data 0x{:0>8x}({}), rs2_data 0x{:0>8x}({})",
+                "        rs1_data: 0x{:0>8x}({}), rs2_data: 0x{:0>8x}({})",
                 rs1_data, rs1_data, rs2_data, rs2_data
+            );
+
+            println!(
+                "        imm_i: 0x{:0>8x}({}), imm_s: 0x{:0>8x}({}), imm_b: 0x{:0>8x}({}), imm_j: 0x{:0>8x}({}), imm_u: 0x{:0>8x}({}), imm_z: 0x{:0>8x}({}),",
+                imm_i, imm_i, imm_s, imm_s, imm_b, imm_b, imm_j, imm_j, imm_u, imm_u, imm_z, imm_z,
             );
 
             Ok(DecodeResult {
@@ -244,6 +259,10 @@ impl Decode {
             "?????????????????111?????1110011" => Some(Opcode::CSRRCI),
 
             "00000000000000000000000001110011" => Some(Opcode::ECALL),
+
+            "00110000001000000000000001110011" => Some(Opcode::MRET),
+
+            "0000????????00000000000000001111" => Some(Opcode::FENCE),
 
             _ => None,
         }
