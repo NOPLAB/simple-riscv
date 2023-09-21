@@ -1,19 +1,22 @@
 use std::{fmt::Display, fs::File, io::Read, path::Path};
 
-use crate::bus::Bus;
+use crate::{bus::Bus, processor::decode::Opcode};
 
 use self::{
-    decode::Decode, execute::Execute, fetch::Fetch, register::XRegisters, writeback::Writeback,
+    cs_register::ControlAndStatusRegister, decode::Decode, execute::Execute, fetch::Fetch,
+    writeback::Writeback, x_register::XRegisters,
 };
 
+pub mod cs_register;
 pub mod decode;
 pub mod execute;
 pub mod fetch;
-pub mod register;
 pub mod writeback;
+pub mod x_register;
 
 pub struct Processor {
     pub xregs: XRegisters,
+    pub csr: ControlAndStatusRegister,
     pub pc: u32,
 
     pub fetch: Fetch,
@@ -28,7 +31,8 @@ impl Processor {
     pub fn new() -> Self {
         Self {
             xregs: XRegisters::new(),
-            pc: 0,
+            csr: ControlAndStatusRegister::new(),
+            pc: 0x800_0000 + 0x1000,
             fetch: Fetch(),
             decode: Decode(),
             execute: Execute(),
@@ -55,13 +59,23 @@ impl Processor {
         println!("Xregisters: {}", self.xregs);
         let inst = self.fetch.fetch(self.pc, &self.bus)?;
         let decode_res = self.decode.decode(inst, &self.xregs)?;
-        let execute_res = self
-            .execute
-            .execute(decode_res, &mut self.bus, &mut self.xregs)?;
-        self.writeback
-            .writeback(decode_res, execute_res, &mut self.xregs, &mut self.bus)?;
+        let execute_res = self.execute.execute(decode_res, self.pc)?;
+        self.writeback.writeback(
+            decode_res,
+            execute_res,
+            &mut self.xregs,
+            &mut self.csr,
+            &mut self.bus,
+        )?;
 
-        self.pc += 4;
+        // この処理はFetchでやるべき
+        if let Some(br_target) = execute_res.br_target {
+            self.pc = br_target
+        } else if let Some(jmp_target) = execute_res.jmp_target {
+            self.pc = jmp_target
+        } else if decode_res.opcode == Opcode::ECALL {
+            self.pc += self.csr.read(0x305)
+        }
 
         println!("");
 

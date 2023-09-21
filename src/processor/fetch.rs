@@ -30,10 +30,10 @@ pub struct Fetch();
 
 impl Fetch {
     pub fn fetch(&mut self, pc: u32, bus: &Bus) -> Result<u32, ProcessorError> {
-        println!("Fetch: 0x{:0>8x}", bus.dram.read32(pc)?);
+        println!("Fetch: 0x{:0>8x}", bus.read32(pc)?);
 
         let physical_pc = pc;
 
-        bus.dram.read32(physical_pc)
+        bus.read32(physical_pc)
     }
 }

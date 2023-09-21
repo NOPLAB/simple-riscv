@@ -1,10 +1,8 @@
 use std::fmt::Display;
 
-use crate::bus::Bus;
-
 use super::{
+    cs_register::ControlAndStatusRegister,
     decode::{DecodeResult, Opcode},
-    register::XRegisters,
     ProcessorError, ProcessorErrorTrait,
 };
 
@@ -30,24 +28,95 @@ impl Display for ExecuteError {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct ExecuteResult {
     pub alu_out: u32,
+    pub br_target: Option<u32>,
+    pub jmp_target: Option<u32>,
 }
 
 pub struct Execute();
 
 impl Execute {
-    pub fn execute(
-        &self,
-        decode: DecodeResult,
-        bus: &mut Bus,
-        xregs: &mut XRegisters,
-    ) -> Result<ExecuteResult, ProcessorError> {
+    pub fn execute(&self, decode: DecodeResult, pc: u32) -> Result<ExecuteResult, ProcessorError> {
         let alu_out: u32 = match decode.opcode {
             Opcode::LW => (decode.rs1_data as i32 + decode.imm_i_sext) as u32,
             Opcode::SW => (decode.rs1_data as i32 + decode.imm_s_sext) as u32,
+
+            Opcode::ADD => decode.rs1_data + decode.rs2_data,
+            Opcode::ADDI => (decode.rs1_data as i32 + decode.imm_i_sext) as u32,
+
+            Opcode::SUB => decode.rs1_data - decode.rs2_data,
+
+            Opcode::AND => decode.rs1_data & decode.rs2_data,
+            Opcode::OR => decode.rs1_data | decode.rs2_data,
+            Opcode::XOR => decode.rs1_data ^ decode.rs2_data,
+            Opcode::ANDI => (decode.rs1_data as i32 & decode.imm_i_sext) as u32,
+            Opcode::ORI => (decode.rs1_data as i32 | decode.imm_i_sext) as u32,
+            Opcode::XORI => (decode.rs1_data as i32 ^ decode.imm_i_sext) as u32,
+
+            Opcode::SLL => decode.rs1_data << decode.rs2_data,
+            Opcode::SRL => decode.rs1_data >> decode.rs2_data,
+            Opcode::SRA => (decode.rs1_data as i32 >> decode.rs2_data) as u32,
+            Opcode::SLLI => decode.rs1_data << decode.imm_i_sext,
+            Opcode::SRLI => decode.rs1_data >> decode.imm_i_sext,
+            Opcode::SRAI => (decode.rs1_data as i32 >> decode.imm_i_sext) as u32,
+
+            Opcode::SLT => ((decode.rs1_data as i32) < (decode.rs2_data as i32)) as u32,
+            Opcode::SLTU => (decode.rs1_data < decode.rs2_data) as u32,
+            Opcode::SLTI => ((decode.rs1_data as i32) < (decode.imm_i_sext as i32)) as u32,
+            Opcode::SLTIU => ((decode.rs1_data as i32) < decode.imm_i_sext) as u32,
+            // Opcode::BEQ => 0,
+            // Opcode::BNE => 0,
+            // Opcode::BLT => 0,
+            // Opcode::BGE => 0,
+            // Opcode::BLTU => 0,
+            // Opcode::BGEU => 0,
+            Opcode::JAL => pc + 4,
+            Opcode::JALR => pc + 4,
+
+            Opcode::LUI => decode.imm_u_shifted,
+            Opcode::AUIPC => pc + decode.imm_u_shifted,
+            // Opcode::CSRRW => 0,
+            // Opcode::CSRRWI => 0,
+            // Opcode::CSRRS => 0,
+            // Opcode::CSRRSI => 0,
+            // Opcode::CSRRC => 0,
+            // Opcode::CSRRCI => 0,
+            // Opcode::ECALL => 0,
+            _ => 0,
         };
-        println!("Execute: alu_out: {}", alu_out);
-        Ok(ExecuteResult { alu_out })
+
+        let br_flg: bool = match decode.opcode {
+            Opcode::BEQ => decode.rs1_data == decode.rs2_data,
+            Opcode::BNE => decode.rs1_data != decode.rs2_data,
+            Opcode::BLT => (decode.rs1_data as i32) < (decode.rs2_data as i32),
+            Opcode::BGE => (decode.rs1_data as i32) >= (decode.rs2_data as i32),
+            Opcode::BLTU => decode.rs1_data < decode.rs2_data,
+            Opcode::BGEU => decode.rs1_data >= decode.rs2_data,
+            _ => false,
+        };
+
+        let br_target: Option<u32> = if br_flg {
+            Some(((pc as i32) + decode.imm_b_sext) as u32)
+        } else {
+            None
+        };
+
+        let jmp_target = match decode.opcode {
+            Opcode::JAL => Some(((pc as i32) + decode.imm_j_sext) as u32),
+            Opcode::JALR => Some((((decode.rs1_data as i32) + decode.imm_i_sext) & (!1)) as u32),
+            _ => None,
+        };
+
+        println!(
+            "Execute: alu_out: {}, br: {:?}, jmp_target: {:?}",
+            alu_out, br_flg, jmp_target
+        );
+        Ok(ExecuteResult {
+            alu_out,
+            br_target,
+            jmp_target,
+        })
     }
 }

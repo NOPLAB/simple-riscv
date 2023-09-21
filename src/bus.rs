@@ -29,7 +29,7 @@ impl Display for BusError {
     }
 }
 
-pub const DRAM_BASE: u32 = 0x8000_0000;
+pub const DRAM_BASE: u32 = 0x800_0000;
 
 #[derive(Debug, Clone)]
 pub struct Bus {

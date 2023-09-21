@@ -41,12 +41,12 @@ const XREGS_CALL: [&str; 32] = [
 impl Display for XRegisters {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut res = String::new();
-        for i in 0..32 {
+        for i in 0..REGISTERS_COUNT {
             let s = format!(
                 "\x1b[38;5;4m{:0>2}-{}:\x1b[m 0x{:x}, ",
                 i,
                 XREGS_CALL[i as usize],
-                self.read(i)
+                self.read(i as u32)
             );
             res = res.add(&s);
         }
