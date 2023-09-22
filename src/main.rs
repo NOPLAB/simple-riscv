@@ -4,12 +4,13 @@ mod dram;
 mod processor;
 
 use computer::Computer;
-use std::path::Path;
+use std::{env, path::Path};
 
 fn main() {
     println!("Hello, world!");
 
-    let path = Path::new("./test/rv32ui-p-sw");
+    let args: Vec<String> = env::args().collect();
+    let path = Path::new(&args[1]);
 
     let mut emulator = Computer::new();
 

@@ -39,24 +39,24 @@ pub enum Opcode {
 
     SUB, // Ok
 
-    AND,
-    OR,
-    XOR,
-    ANDI,
-    ORI,
-    XORI,
+    AND,  // Ok
+    OR,   // Ok
+    XOR,  // Ok
+    ANDI, // Ok
+    ORI,  // Ok
+    XORI, // Ok
 
-    SLL,
-    SRL,
-    SRA,
-    SLLI,
-    SRLI,
-    SRAI,
+    SLL,  // Ok
+    SRL,  // Ok
+    SRA,  // Ok
+    SLLI, // Ok
+    SRLI, // Ok
+    SRAI, // Ok
 
-    SLT,
-    SLTU,
-    SLTI,
-    SLTIU,
+    SLT,   // Ok
+    SLTU,  // Ok
+    SLTI,  // Ok
+    SLTIU, // Ok
 
     BEQ,
     BNE,
