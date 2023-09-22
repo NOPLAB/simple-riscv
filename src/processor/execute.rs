@@ -75,8 +75,8 @@ impl Execute {
             Opcode::JAL => pc + 4,
             Opcode::JALR => pc + 4,
 
-            Opcode::LUI => decode.imm_u_shifted,
-            Opcode::AUIPC => pc + decode.imm_u_shifted,
+            Opcode::LUI => decode.imm_u_sext_shifted as u32,
+            Opcode::AUIPC => ((pc as i32).wrapping_add(decode.imm_u_sext_shifted)) as u32,
             // Opcode::CSRRW => 0,
             // Opcode::CSRRWI => 0,
             // Opcode::CSRRS => 0,

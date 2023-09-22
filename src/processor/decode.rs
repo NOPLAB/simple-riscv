@@ -58,18 +58,18 @@ pub enum Opcode {
     SLTI,  // Ok
     SLTIU, // Ok
 
-    BEQ,
-    BNE,
-    BLT,
-    BGE,
-    BLTU,
-    BGEU,
+    BEQ,  // Ok
+    BNE,  // Ok
+    BLT,  // Ok
+    BGE,  // Ok
+    BLTU, // Ok
+    BGEU, // Ok
 
-    JAL,
-    JALR,
+    JAL,  // Ok
+    JALR, // Ok
 
-    LUI,
-    AUIPC,
+    LUI,   // Ok
+    AUIPC, // Ok
 
     CSRRW,
     CSRRWI,
@@ -105,7 +105,7 @@ pub struct DecodeResult {
     pub imm_j_sext: i32,
 
     pub imm_u: u32,
-    pub imm_u_shifted: u32,
+    pub imm_u_sext_shifted: i32,
 
     pub imm_z: u32,
 
@@ -154,7 +154,7 @@ impl Decode {
         let imm_j_sext = imm_j_vec.load::<i32>();
 
         let imm_u = inst_slice[12..=31].load::<u32>();
-        let imm_u_shifted = imm_u << 12;
+        let imm_u_sext_shifted = (imm_u << 12) as i32;
 
         let imm_z = inst_slice[15..=19].load::<u32>();
 
@@ -191,7 +191,7 @@ impl Decode {
                 imm_j,
                 imm_j_sext,
                 imm_u,
-                imm_u_shifted,
+                imm_u_sext_shifted,
                 imm_z,
                 csr,
             })
