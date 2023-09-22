@@ -1,6 +1,6 @@
 use std::{path::Path, thread, time::Duration};
 
-use crate::processor::{Processor, ProcessorError};
+use crate::processor::{Processor, ProcessorError, ProcessorResult};
 
 pub struct Computer {
     processor: Processor,
@@ -20,7 +20,10 @@ impl Computer {
         self.processor.load(path)?;
 
         loop {
-            self.processor.increment()?;
+            match self.processor.increment()? {
+                ProcessorResult::OK => (),
+                ProcessorResult::ECALL => break,
+            };
             // thread::sleep(Duration::from_millis(100));
         }
 

@@ -14,6 +14,12 @@ pub mod fetch;
 pub mod writeback;
 pub mod x_register;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessorResult {
+    OK,
+    ECALL,
+}
+
 pub struct Processor {
     pub xregs: XRegisters,
     pub csr: ControlAndStatusRegister,
@@ -53,7 +59,7 @@ impl Processor {
     }
 
     // todo
-    pub fn increment(&mut self) -> Result<(), ProcessorError> {
+    pub fn increment(&mut self) -> Result<ProcessorResult, ProcessorError> {
         println!("pc: 0x{:0>8x}", self.pc - 0x1000); // !DO
 
         println!("Xregisters: {}", self.xregs);
@@ -76,15 +82,16 @@ impl Processor {
             self.pc = jmp_target;
             println!("Processor: JMP TARGET: {:x}", jmp_target);
         } else if decode_res.opcode == Opcode::ECALL {
-            self.pc += self.csr.read(0x305);
+            self.pc = self.csr.read(0x305);
             println!("Processor: ECALL!!!!");
+            return Ok(ProcessorResult::ECALL);
         } else {
             self.pc += 4;
         }
 
         println!("");
 
-        Ok(())
+        Ok(ProcessorResult::OK)
     }
 }
 
