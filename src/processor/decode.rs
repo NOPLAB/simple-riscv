@@ -31,13 +31,13 @@ impl Display for DecodeError {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Opcode {
-    LW,
-    SW,
+    LW, // Ok
+    SW, // Ok
 
-    ADD,
-    ADDI,
+    ADD,  // Ok
+    ADDI, // Ok
 
-    SUB,
+    SUB, // Ok
 
     AND,
     OR,
@@ -129,17 +129,12 @@ impl Decode {
         let imm_i_sext = inst_slice[20..=31].load::<i32>();
 
         let mut imm_s_vec = bitvec![u32, Lsb0;];
-        imm_s_vec.append(&mut inst_slice[25..=31].to_bitvec());
         imm_s_vec.append(&mut inst_slice[7..=11].to_bitvec());
+        imm_s_vec.append(&mut inst_slice[25..=31].to_bitvec());
         let imm_s = imm_s_vec.load::<u32>();
         let imm_s_sext = imm_s_vec.load::<i32>();
 
         let mut imm_b_vec = bitvec![u32, Lsb0;];
-        // imm_b_vec.push(inst_slice[31]);
-        // imm_b_vec.push(inst_slice[7]);
-        // imm_b_vec.append(&mut inst_slice[25..=30].to_bitvec());
-        // imm_b_vec.append(&mut inst_slice[8..=11].to_bitvec());
-        // imm_b_vec.push(false);
         imm_b_vec.push(false);
         imm_b_vec.append(&mut inst_slice[8..=11].to_bitvec());
         imm_b_vec.append(&mut inst_slice[25..=30].to_bitvec());

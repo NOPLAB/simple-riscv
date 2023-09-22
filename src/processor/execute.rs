@@ -46,7 +46,7 @@ impl Execute {
             Opcode::ADD => decode.rs1_data.wrapping_add(decode.rs2_data),
             Opcode::ADDI => (decode.rs1_data as i32).wrapping_add(decode.imm_i_sext) as u32,
 
-            Opcode::SUB => decode.rs1_data - decode.rs2_data,
+            Opcode::SUB => decode.rs1_data.wrapping_sub(decode.rs2_data),
 
             Opcode::AND => decode.rs1_data & decode.rs2_data,
             Opcode::OR => decode.rs1_data | decode.rs2_data,
