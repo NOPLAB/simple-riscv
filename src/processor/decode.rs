@@ -31,7 +31,14 @@ impl Display for DecodeError {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Opcode {
-    LW, // Ok
+    LB,  // todo
+    LH,  // todo
+    LW,  // Ok
+    LBU, // todo
+    LHU, // todo
+
+    SB, // todo
+    SH, // todo
     SW, // Ok
 
     ADD,  // Ok
@@ -78,10 +85,18 @@ pub enum Opcode {
     CSRRC,
     CSRRCI,
 
-    ECALL,
+    URET, // todo
+    SRET, // todo
+    MRET, // todo
 
-    MRET,  // todo
-    FENCE, // todo
+    WFI, // todo
+
+    ECALL,
+    EBREAK, // todo
+
+    FENCE,     // todo
+    FENCEI,    // todo
+    SFENCEVMA, //todo
 }
 
 #[derive(Debug, Clone, Copy)]
