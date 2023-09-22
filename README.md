@@ -1,5 +1,13 @@
 # simple-riscv
 
+## What is this
+
+RISC-V(rv32ui)をRust言語を用いてエミュレーターとして実装しました。
+
+`simple-riscv` というリポジトリ名にある通り、シンプルで読みやすくわかりやすくなるように実装しました。
+
+`src/processor/decode.rs` に実装されている命令一覧があります。
+
 ## Run
 
 ```shell
