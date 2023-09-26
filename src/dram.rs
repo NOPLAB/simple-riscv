@@ -1,10 +1,12 @@
 use crate::processor::{ProcessorError, ProcessorErrorTrait};
 use std::fmt::Display;
 
+#[derive(Debug)]
 pub enum DramErrorType {
     AddressOutOfBounds,
 }
 
+#[derive(Debug)]
 pub struct DramError {
     error_type: DramErrorType,
 }

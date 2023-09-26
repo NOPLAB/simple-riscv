@@ -5,10 +5,12 @@ use crate::{
     processor::{ProcessorError, ProcessorErrorTrait},
 };
 
+#[derive(Debug)]
 pub enum BusErrorType {
     AddressOutOfBounds,
 }
 
+#[derive(Debug)]
 pub struct BusError {
     pub error_type: BusErrorType,
 }

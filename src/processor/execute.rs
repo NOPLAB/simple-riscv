@@ -6,8 +6,10 @@ use super::{
     ProcessorError, ProcessorErrorTrait,
 };
 
+#[derive(Debug)]
 pub enum ExecuteErrorType {}
 
+#[derive(Debug)]
 pub struct ExecuteError {
     error_type: ExecuteErrorType,
 }

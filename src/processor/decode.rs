@@ -5,10 +5,12 @@ use bitvec::{bitvec, field::BitField, prelude::Lsb0, view::BitView};
 
 use super::{x_register::XRegisters, ProcessorError, ProcessorErrorTrait};
 
+#[derive(Debug)]
 pub enum DecodeErrorType {
     NotMatchOpcode,
 }
 
+#[derive(Debug)]
 pub struct DecodeError {
     error_type: DecodeErrorType,
 }

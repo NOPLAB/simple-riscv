@@ -4,8 +4,10 @@ use crate::bus::Bus;
 
 use super::{ProcessorError, ProcessorErrorTrait};
 
+#[derive(Debug)]
 pub enum FetchErrorType {}
 
+#[derive(Debug)]
 pub struct FetchError {
     error_type: FetchErrorType,
 }

@@ -10,8 +10,10 @@ use super::{
     ProcessorError, ProcessorErrorTrait,
 };
 
+#[derive(Debug)]
 pub enum WritebackErrorType {}
 
+#[derive(Debug)]
 pub struct WritebackError {
     error_type: WritebackErrorType,
 }

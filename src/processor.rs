@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::fmt::{Debug, Display};
 
 use crate::{bus::Bus, console_log, processor::decode::Opcode};
 
@@ -98,5 +98,5 @@ impl Default for Processor {
     }
 }
 
-pub trait ProcessorErrorTrait: Display {}
+pub trait ProcessorErrorTrait: Display + Debug {}
 pub type ProcessorError = Box<dyn ProcessorErrorTrait>;
