@@ -13,7 +13,7 @@ RISC-V(rv32ui)をRust言語を用いてエミュレーターとして実装し�
 ## Run
 
 ```shell
-cargo run filename
+cargo run filepath
 ```
 
 ## Example
