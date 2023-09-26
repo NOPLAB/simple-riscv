@@ -3,7 +3,7 @@ mod computer;
 mod dram;
 mod processor;
 
-use computer::Computer;
+use processor::{Processor, ProcessorResult};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -32,10 +32,35 @@ macro_rules! console_log {
 }
 
 #[wasm_bindgen]
-pub fn run(program: Vec<u8>) {
-    let mut riscv = Computer::new();
-    match riscv.run(program) {
-        Err(err) => console_log!("{}", err),
-        Ok(_) => console_log!("Ok"),
-    };
+pub struct WasmComputer {
+    processor: Processor,
+}
+
+#[wasm_bindgen]
+#[derive(Copy, Clone, Debug)]
+pub enum WasmComputerResult {
+    OK,
+    ECALL,
+}
+
+#[wasm_bindgen]
+impl WasmComputer {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Self {
+        Self {
+            processor: Processor::new(),
+        }
+    }
+
+    pub fn load(&mut self, program: Vec<u8>) -> Result<(), JsValue> {
+        Ok(self.processor.load(program).unwrap())
+    }
+
+    pub fn increment(&mut self) -> Result<WasmComputerResult, JsValue> {
+        match self.processor.increment() {
+            Ok(ProcessorResult::OK) => Ok(WasmComputerResult::OK),
+            Ok(ProcessorResult::ECALL) => Ok(WasmComputerResult::ECALL),
+            Err(err) => Err(err.to_string().into()),
+        }
+    }
 }

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
 import { ChangeEvent } from "react";
-import init, { run } from '../../pkg';
+import init, { run, WasmComputer, WasmComputerResult } from "../../pkg";
 
 const Wasm = (input: ChangeEvent<HTMLInputElement>) => {
   let reader = new FileReader();
@@ -9,7 +9,14 @@ const Wasm = (input: ChangeEvent<HTMLInputElement>) => {
     if (reader.result instanceof ArrayBuffer) {
       let program = new Uint8Array(reader.result);
       init().then(() => {
-        run(program)
+        let computer = new WasmComputer();
+        computer.load(program);
+        while (true) {
+          let result = computer.increment();
+          if (result == WasmComputerResult.ECALL) {
+            return;
+          }
+        }
       });
     }
   };
@@ -17,12 +24,12 @@ const Wasm = (input: ChangeEvent<HTMLInputElement>) => {
   if (input.target.files?.[0] != null) {
     reader.readAsArrayBuffer(input.target.files?.[0]);
   }
-}
+};
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <input type="file" onChange={Wasm}></input>
     </main>
-  )
+  );
 }

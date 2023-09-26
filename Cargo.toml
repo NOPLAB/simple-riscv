@@ -1,16 +1,17 @@
 [package]
+edition = "2021"
 name = "simple-riscv"
 version = "0.1.0"
-edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-crate-type=["cdylib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 wasm-bindgen = "0.2.87"
+web-sys = {version = "0.3.64", features = ["Document", "Element", "HtmlElement", "Node", "Window"]}
 
-bitvec = "1.0.1"
-bitpattern = "0.1.0"
 bitmatch = "0.1.1"
+bitpattern = "0.1.0"
+bitvec = "1.0.1"
