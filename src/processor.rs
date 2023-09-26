@@ -1,6 +1,6 @@
-use std::{fmt::Display, fs::File, io::Read, path::Path};
+use std::fmt::Display;
 
-use crate::{bus::Bus, processor::decode::Opcode};
+use crate::{bus::Bus, console_log, processor::decode::Opcode};
 
 use self::{
     cs_register::ControlAndStatusRegister, decode::Decode, execute::Execute, fetch::Fetch,
@@ -47,12 +47,8 @@ impl Processor {
         }
     }
 
-    pub fn load(&mut self, path: &Path) -> Result<(), ProcessorError> {
-        let mut file = File::open(path).unwrap();
-        let mut data = Vec::new();
-        file.read_to_end(&mut data).unwrap();
-
-        self.bus.dram.load8(0, data)?;
+    pub fn load(&mut self, program: Vec<u8>) -> Result<(), ProcessorError> {
+        self.bus.dram.load8(0, program)?;
         // println!("{}", self.bus.dram);
 
         Ok(())
@@ -60,7 +56,8 @@ impl Processor {
 
     // todo
     pub fn increment(&mut self) -> Result<ProcessorResult, ProcessorError> {
-        println!("pc: 0x{:0>8x}", self.pc - 0x1000); // !DO
+        // println!("pc: 0x{:0>8x}", self.pc - 0x1000); // !DO
+        console_log!("pc: 0x{:0>8x}", self.pc);
 
         println!("Xregisters: {}", self.xregs);
         let inst = self.fetch.fetch(self.pc, &self.bus)?;

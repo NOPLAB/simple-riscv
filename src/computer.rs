@@ -1,5 +1,3 @@
-use std::{path::Path, thread, time::Duration};
-
 use crate::processor::{Processor, ProcessorError, ProcessorResult};
 
 pub struct Computer {
@@ -13,11 +11,9 @@ impl Computer {
         }
     }
 
-    pub fn run(&mut self, path: &Path) -> Result<(), ProcessorError> {
-        println!("RUN - {}", path.to_str().unwrap());
-
+    pub fn run(&mut self, program: Vec<u8>) -> Result<(), ProcessorError> {
         self.processor = Processor::new();
-        self.processor.load(path)?;
+        self.processor.load(program)?;
 
         loop {
             match self.processor.increment()? {
