@@ -89,7 +89,7 @@ impl Processor {
             self.pc += 4;
         }
 
-        println!("");
+        println!();
 
         Ok(ProcessorResult::OK)
     }

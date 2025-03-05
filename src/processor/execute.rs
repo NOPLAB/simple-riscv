@@ -1,7 +1,6 @@
 use std::fmt::Display;
 
 use super::{
-    cs_register::ControlAndStatusRegister,
     decode::{DecodeResult, Opcode},
     ProcessorError, ProcessorErrorTrait,
 };
@@ -22,9 +21,7 @@ impl ProcessorErrorTrait for ExecuteError {}
 
 impl Display for ExecuteError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &self.error_type {
-            _ => todo!(),
-        }
+        todo!()
     }
 }
 

@@ -9,7 +9,7 @@ pub struct ControlAndStatusRegister {
 
 impl ControlAndStatusRegister {
     pub fn new() -> Self {
-        let mut xregs = [0u32; REGISTERS_COUNT];
+        let xregs = [0u32; REGISTERS_COUNT];
 
         Self { csregs: xregs }
     }

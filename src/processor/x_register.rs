@@ -45,7 +45,7 @@ impl Display for XRegisters {
             let s = format!(
                 "\x1b[38;5;4m{:0>2}-{}:\x1b[m 0x{:x}, ",
                 i,
-                XREGS_CALL[i as usize],
+                XREGS_CALL[i],
                 self.read(i as u32)
             );
             res = res.add(&s);

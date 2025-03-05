@@ -42,56 +42,56 @@ impl Bus {
     }
 
     pub fn load8(&mut self, start_address: u32, data: Vec<u8>) -> Result<(), ProcessorError> {
-        if start_address >= DRAM_BASE as u32 {
-            self.dram.load8(start_address - DRAM_BASE as u32, data)
+        if start_address >= DRAM_BASE {
+            self.dram.load8(start_address - DRAM_BASE, data)
         } else {
             Err(BusError::new(BusErrorType::AddressOutOfBounds))
         }
     }
 
     pub fn read8(&self, address: u32) -> Result<u8, ProcessorError> {
-        if address >= DRAM_BASE as u32 {
-            self.dram.read8(address - DRAM_BASE as u32)
+        if address >= DRAM_BASE {
+            self.dram.read8(address - DRAM_BASE)
         } else {
             Err(BusError::new(BusErrorType::AddressOutOfBounds))
         }
     }
 
     pub fn read16(&self, address: u32) -> Result<u16, ProcessorError> {
-        if address >= DRAM_BASE as u32 {
-            self.dram.read16(address - DRAM_BASE as u32)
+        if address >= DRAM_BASE {
+            self.dram.read16(address - DRAM_BASE)
         } else {
             Err(BusError::new(BusErrorType::AddressOutOfBounds))
         }
     }
 
     pub fn read32(&self, address: u32) -> Result<u32, ProcessorError> {
-        if address >= DRAM_BASE as u32 {
-            self.dram.read32(address - DRAM_BASE as u32)
+        if address >= DRAM_BASE {
+            self.dram.read32(address - DRAM_BASE)
         } else {
             Err(BusError::new(BusErrorType::AddressOutOfBounds))
         }
     }
 
     pub fn write8(&mut self, address: u32, value: u8) -> Result<(), ProcessorError> {
-        if address >= DRAM_BASE as u32 {
-            self.dram.write8(address - DRAM_BASE as u32, value)
+        if address >= DRAM_BASE {
+            self.dram.write8(address - DRAM_BASE, value)
         } else {
             Err(BusError::new(BusErrorType::AddressOutOfBounds))
         }
     }
 
     pub fn write16(&mut self, address: u32, value: u16) -> Result<(), ProcessorError> {
-        if address >= DRAM_BASE as u32 {
-            self.dram.write16(address - DRAM_BASE as u32, value)
+        if address >= DRAM_BASE {
+            self.dram.write16(address - DRAM_BASE, value)
         } else {
             Err(BusError::new(BusErrorType::AddressOutOfBounds))
         }
     }
 
     pub fn write32(&mut self, address: u32, value: u32) -> Result<(), ProcessorError> {
-        if address >= DRAM_BASE as u32 {
-            self.dram.write32(address - DRAM_BASE as u32, value)
+        if address >= DRAM_BASE {
+            self.dram.write32(address - DRAM_BASE, value)
         } else {
             Err(BusError::new(BusErrorType::AddressOutOfBounds))
         }

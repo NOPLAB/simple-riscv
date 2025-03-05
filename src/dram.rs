@@ -25,7 +25,7 @@ impl Display for DramError {
     }
 }
 
-pub const DRAM_SIZE: u32 = 1024 * 1024 * 1; // 1MB
+pub const DRAM_SIZE: u32 = 1024 * 1024; // 1MB
 
 #[derive(Debug, Clone)]
 pub struct Dram {
@@ -40,7 +40,7 @@ impl Dram {
     }
 
     pub fn load8(&mut self, start_address: u32, data: Vec<u8>) -> Result<(), ProcessorError> {
-        if start_address + (data.len() as u32) < DRAM_SIZE as u32 {
+        if start_address + (data.len() as u32) < DRAM_SIZE {
             for (count, mem) in self
                 .dram
                 .iter_mut()
@@ -57,7 +57,7 @@ impl Dram {
     }
 
     pub fn read8(&self, address: u32) -> Result<u8, ProcessorError> {
-        if address < DRAM_SIZE as u32 {
+        if address < DRAM_SIZE {
             Ok(self.dram[address as usize])
         } else {
             Err(DramError::new(DramErrorType::AddressOutOfBounds))
@@ -65,7 +65,7 @@ impl Dram {
     }
 
     pub fn read16(&self, address: u32) -> Result<u16, ProcessorError> {
-        if address < DRAM_SIZE as u32 {
+        if address < DRAM_SIZE {
             Ok(
                 (self.dram[address as usize + 1] as u16) << 8
                     | (self.dram[address as usize] as u16),
@@ -76,7 +76,7 @@ impl Dram {
     }
 
     pub fn read32(&self, address: u32) -> Result<u32, ProcessorError> {
-        if address < DRAM_SIZE as u32 {
+        if address < DRAM_SIZE {
             Ok((self.dram[address as usize + 3] as u32) << 24
                 | (self.dram[address as usize + 2] as u32) << 16
                 | (self.dram[address as usize + 1] as u32) << 8
@@ -87,7 +87,7 @@ impl Dram {
     }
 
     pub fn write8(&mut self, address: u32, value: u8) -> Result<(), ProcessorError> {
-        if address < DRAM_SIZE as u32 {
+        if address < DRAM_SIZE {
             self.dram[address as usize] = value;
             Ok(())
         } else {
@@ -96,7 +96,7 @@ impl Dram {
     }
 
     pub fn write16(&mut self, address: u32, value: u16) -> Result<(), ProcessorError> {
-        if address < DRAM_SIZE as u32 {
+        if address < DRAM_SIZE {
             self.dram[address as usize + 1] = (value >> 8) as u8;
             self.dram[address as usize] = value as u8;
             Ok(())
@@ -106,7 +106,7 @@ impl Dram {
     }
 
     pub fn write32(&mut self, address: u32, value: u32) -> Result<(), ProcessorError> {
-        if address < DRAM_SIZE as u32 {
+        if address < DRAM_SIZE {
             self.dram[address as usize + 3] = (value >> 24) as u8;
             self.dram[address as usize + 2] = ((value & 0x00FF_0000) >> 16) as u8;
             self.dram[address as usize + 1] = ((value & 0x0000_FF00) >> 8) as u8;

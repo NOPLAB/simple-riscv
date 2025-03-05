@@ -26,9 +26,7 @@ impl ProcessorErrorTrait for WritebackError {}
 
 impl Display for WritebackError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &self.error_type {
-            _ => todo!(),
-        }
+        todo!()
     }
 }
 
