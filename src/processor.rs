@@ -1,4 +1,4 @@
-use std::{fmt::Display, fs::File, io::Read, path::Path};
+use std::fmt::Display;
 
 use crate::{bus::Bus, processor::decode::Opcode};
 
@@ -14,13 +14,17 @@ pub mod fetch;
 pub mod writeback;
 pub mod x_register;
 
+pub trait Processor {
+    fn increment(&mut self, computer: &mut Bus) -> Result<ProcessorResult, ProcessorError>;
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessorResult {
     OK,
     ECALL,
 }
 
-pub struct Processor {
+pub struct RiscVProcessor {
     pub xregs: XRegisters,
     pub csr: ControlAndStatusRegister,
     pub pc: u32,
@@ -29,11 +33,9 @@ pub struct Processor {
     pub decode: Decode,
     pub execute: Execute,
     pub writeback: Writeback,
-
-    pub bus: Bus,
 }
 
-impl Processor {
+impl RiscVProcessor {
     pub fn new() -> Self {
         Self {
             xregs: XRegisters::new(),
@@ -43,27 +45,17 @@ impl Processor {
             decode: Decode(),
             execute: Execute(),
             writeback: Writeback(),
-            bus: Bus::new(),
         }
     }
+}
 
-    pub fn load(&mut self, path: &Path) -> Result<(), ProcessorError> {
-        let mut file = File::open(path).unwrap();
-        let mut data = Vec::new();
-        file.read_to_end(&mut data).unwrap();
-
-        self.bus.dram.load8(0, data)?;
-        // println!("{}", self.bus.dram);
-
-        Ok(())
-    }
-
+impl Processor for RiscVProcessor {
     // todo
-    pub fn increment(&mut self) -> Result<ProcessorResult, ProcessorError> {
+    fn increment(&mut self, bus: &mut Bus) -> Result<ProcessorResult, ProcessorError> {
         println!("pc: 0x{:0>8x}", self.pc - 0x1000); // !DO
 
         println!("Xregisters: {}", self.xregs);
-        let inst = self.fetch.fetch(self.pc, &self.bus)?;
+        let inst = self.fetch.fetch(self.pc, &bus)?;
         let decode_res = self.decode.decode(inst, &self.xregs)?;
         let execute_res = self.execute.execute(decode_res, self.pc)?;
         self.writeback.writeback(
@@ -71,7 +63,7 @@ impl Processor {
             execute_res,
             &mut self.xregs,
             &mut self.csr,
-            &mut self.bus,
+            bus,
         )?;
 
         // この処理はFetchでやるべき
@@ -92,12 +84,6 @@ impl Processor {
         println!();
 
         Ok(ProcessorResult::OK)
-    }
-}
-
-impl Default for Processor {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

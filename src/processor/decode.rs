@@ -29,6 +29,7 @@ impl Display for DecodeError {
     }
 }
 
+#[deny(non_camel_case_types)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Opcode {
     LB,  // todo

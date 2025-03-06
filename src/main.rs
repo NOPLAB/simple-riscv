@@ -3,7 +3,9 @@ mod computer;
 mod dram;
 mod processor;
 
+use bus::Bus;
 use computer::Computer;
+use processor::RiscVProcessor;
 use std::{env, path::Path};
 
 fn main() {
@@ -12,9 +14,14 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let path = Path::new(&args[1]);
 
-    let mut emulator = Computer::new();
+    let bus = Bus::new();
+    let processor = RiscVProcessor::new();
 
-    if let Result::Err(error) = emulator.run(path) {
+    let mut emulator = Computer::new(processor, bus);
+
+    emulator.load_from_file(0x80000000, path).unwrap();
+
+    if let Result::Err(error) = emulator.run() {
         println!("{}", error);
     }
 }
