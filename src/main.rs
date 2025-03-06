@@ -3,9 +3,9 @@ mod computer;
 mod dram;
 mod processor;
 
+use crate::processor::riscv::rv32ui::RiscVUIProcessor;
 use bus::Bus;
 use computer::Computer;
-use processor::RiscVProcessor;
 use std::{env, path::Path};
 
 fn main() {
@@ -15,7 +15,7 @@ fn main() {
     let path = Path::new(&args[1]);
 
     let bus = Bus::new();
-    let processor = RiscVProcessor::new();
+    let processor = RiscVUIProcessor::new();
 
     let mut emulator = Computer::new(processor, bus);
 

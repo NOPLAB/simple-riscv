@@ -1,8 +1,8 @@
 use std::fmt::Display;
 
 use crate::bus::Bus;
-
-use super::{ProcessorError, ProcessorErrorTrait};
+use crate::processor::ProcessorError;
+use crate::processor::ProcessorErrorTrait;
 
 pub enum FetchErrorType {}
 

@@ -1,14 +1,14 @@
 use std::fmt::Display;
 
-use crate::bus::Bus;
+use super::cs_register::ControlAndStatusRegister;
+use super::decode::DecodeResult;
+use super::decode::Opcode;
+use super::execute::ExecuteResult;
+use super::x_register::XRegisters;
 
-use super::{
-    cs_register::ControlAndStatusRegister,
-    decode::{DecodeResult, Opcode},
-    execute::ExecuteResult,
-    x_register::XRegisters,
-    ProcessorError, ProcessorErrorTrait,
-};
+use crate::bus::Bus;
+use crate::processor::ProcessorError;
+use crate::processor::ProcessorErrorTrait;
 
 pub enum WritebackErrorType {}
 

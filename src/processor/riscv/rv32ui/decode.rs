@@ -3,7 +3,10 @@ use std::fmt::Display;
 use bitmatch::bitmatch;
 use bitvec::{bitvec, field::BitField, prelude::Lsb0, view::BitView};
 
-use super::{x_register::XRegisters, ProcessorError, ProcessorErrorTrait};
+use crate::processor::ProcessorError;
+use crate::processor::ProcessorErrorTrait;
+
+use super::x_register::XRegisters;
 
 pub enum DecodeErrorType {
     NotMatchOpcode,

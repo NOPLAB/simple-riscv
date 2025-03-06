@@ -1,9 +1,9 @@
 use std::fmt::Display;
 
-use super::{
-    decode::{DecodeResult, Opcode},
-    ProcessorError, ProcessorErrorTrait,
-};
+use super::decode::Opcode;
+use super::decode::DecodeResult;
+use crate::processor::ProcessorError;
+use crate::processor::ProcessorErrorTrait;
 
 pub enum ExecuteErrorType {}
 
